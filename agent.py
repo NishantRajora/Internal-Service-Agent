@@ -7,31 +7,34 @@ from database import create_ticket, add_audit_log, get_all_tickets
 from auth_utils import verify_password
 
 # Load environment variables
-# load_dotenv()
+load_dotenv()
 
+# ============================================================
+# CONFIGURATION
+# ============================================================
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip('/')
+OLLAMA_API_KEY = os.getenv("OLLAMA_API_KEY", "")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 
+# Construct the final endpoint
+OLLAMA_URL = f"{OLLAMA_BASE_URL}/api/generate"
 
 # ============================================================
 # OLLAMA API HELPER
 # ============================================================
 def call_ollama(prompt, system_prompt="You are a helpful AI assistant."):
-    import os
-    model = os.getenv("OLLAMA_MODEL", "llama3")
-    url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-    api_key = os.getenv("OLLAMA_API_KEY", "")
-
     payload = {
-        "model": model,
+        "model": OLLAMA_MODEL,
         "prompt": prompt,
         "system": system_prompt,
         "stream": False,
         "format": "json" if "json" in system_prompt.lower() else ""
     }
     headers = {}
-    if api_key:
-        headers["Authorization"] = f"Bearer {api_key}"
+    if OLLAMA_API_KEY:
+        headers["Authorization"] = f"Bearer {OLLAMA_API_KEY}"
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        response = requests.post(OLLAMA_URL, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json().get("response", "").strip()
     except Exception as e:
