@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="main-body">
     <!-- Onboarding / Login Screen -->
     <div id="login-screen" class="auth-container">
@@ -25,13 +27,15 @@
                     <label>Employee Email</label>
                     <input type="email" id="loginEmail" placeholder="email@veridian-corp.example">
                 </div>
-                <button onclick="handleUserLogin()" class="primary-btn">Enter Portal <i class="fas fa-arrow-right"></i></button>
+                <button onclick="handleUserLogin()" class="primary-btn">Enter Portal <i
+                        class="fas fa-arrow-right"></i></button>
 
                 <div class="auth-divider">
                     <span>OR</span>
                 </div>
 
-                <button onclick="openAdminLogin()" class="secondary-btn">Log in as Admin <i class="fas fa-lock"></i></button>
+                <button onclick="openAdminLogin()" class="primary-btn">Log in as Admin <i
+                        class="fas fa-lock"></i></button>
             </div>
         </div>
     </div>
@@ -48,6 +52,9 @@
                 <button onclick="showTab('my-tickets')" class="nav-btn" id="btn-my-tickets">🎫 My Tickets</button>
                 <button onclick="showTab('admin')" class="nav-btn" id="btn-admin">🔐 Admin</button>
             </nav>
+            <button id="logout-user" onclick="logoutUser()" class="logout-btn">Logout</button>
+
+
         </header>
 
         <main>
@@ -104,9 +111,12 @@
                     </div>
 
                     <div class="admin-tabs">
-                        <button onclick="loadAdminTab('tickets')" class="admin-tab-btn active" id="tab-tickets">Tickets</button>
-                        <button onclick="loadAdminTab('audit')" class="admin-tab-btn" id="tab-audit">Audit Trail</button>
-                        <button onclick="loadAdminTab('policies')" class="admin-tab-btn" id="tab-policies">Policies</button>
+                        <button onclick="loadAdminTab('tickets')" class="admin-tab-btn active"
+                            id="tab-tickets">Tickets</button>
+                        <button onclick="loadAdminTab('audit')" class="admin-tab-btn" id="tab-audit">Audit
+                            Trail</button>
+                        <button onclick="loadAdminTab('policies')" class="admin-tab-btn"
+                            id="tab-policies">Policies</button>
                     </div>
 
                     <div id="admin-content" class="admin-content">
@@ -118,4 +128,5 @@
     </div>
     <script src="/static/script.js"></script>
 </body>
+
 </html>

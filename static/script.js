@@ -10,9 +10,16 @@ async function showTab(tab) {
     const btn = document.getElementById(`btn-${tab}`);
     if (btn) btn.classList.add('active');
 
-    if (tab === 'my-tickets') {
-        loadMyTickets();
+    // Hide the employee logout button when admin view is active, show otherwise
+    const logoutUserBtn = document.getElementById('logout-user');
+    if (logoutUserBtn) {
+        if (tab === 'admin') {
+            logoutUserBtn.style.display = 'none';
+        } else {
+            logoutUserBtn.style.display = 'inline-block';
+        }
     }
+
 }
 
 async function appendMessage(sender, text) {
@@ -46,7 +53,15 @@ async function sendRequest() {
 
         const data = await response.json();
         if (response.ok) {
+            // Show the AI's response
             appendMessage('ai', data.response);
+            // If a ticket was created, inform the user and refresh My Tickets
+            if (data.ticket && data.ticket.ticket_id) {
+                const ticketMsg = `✅ Ticket ${data.ticket.ticket_id} has been created and will appear in your tickets.`;
+                appendMessage('ai', ticketMsg);
+                // Preload tickets list (for when the user opens My Tickets)
+                loadMyTickets();
+            }
         } else {
             appendMessage('ai', `Error: ${data.detail || 'Something went wrong'}`);
         }
@@ -138,6 +153,18 @@ function logoutAdmin() {
     // Reset the admin login state within the app
     document.getElementById('admin-login').style.display = 'block';
     document.getElementById('admin-dashboard').style.display = 'none';
+}
+function logoutUser() {
+    // Clear user session fields
+    document.getElementById('userName').value = '';
+    document.getElementById('userEmail').value = '';
+    document.getElementById('displayUserName').innerText = 'Veridian IT Support';
+    // Hide main app, show login screen
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    // Reset onboarding inputs
+    document.getElementById('loginName').value = '';
+    document.getElementById('loginEmail').value = '';
 }
 
 async function loadAdminTab(tab) {
