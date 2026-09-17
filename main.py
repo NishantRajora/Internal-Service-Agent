@@ -6,7 +6,7 @@ from typing import Optional
 import secrets
 
 from agent import process_request
-from database import get_all_tickets, get_audit_logs, get_setting
+from database import get_all_tickets, get_audit_logs, get_setting, get_ticket
 from retriever import load_policies
 from auth_utils import verify_password
 
@@ -36,6 +36,9 @@ class SupportRequest(BaseModel):
 
 class LoginRequest(BaseModel):
     password: str
+
+class TicketUpdate(BaseModel):
+    status: str
 
 # ============================================================
 # AUTHENTICATION
@@ -109,6 +112,20 @@ async def list_tickets():
     """
     try:
         return get_all_tickets()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@app.patch("/api/support/tickets/{ticket_id}", dependencies=[Depends(verify_admin_token)])
+async def update_ticket(ticket_id: str, update: TicketUpdate):
+    """
+    Update ticket status (Admin only).
+    """
+    from database import update_ticket_status
+    try:
+        success = update_ticket_status(ticket_id, update.status)
+        if not success:
+            raise HTTPException(status_code=404, detail="Ticket not found")
+        return {"message": "Ticket updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 

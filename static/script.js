@@ -1,27 +1,5 @@
 const API_BASE = "/api";
 
-async function handleUserLogin() {
-    const name = document.getElementById('loginName').value;
-    const email = document.getElementById('loginEmail').value;
-
-    if (!name || !email) {
-        alert("Please enter both your name and email to enter the portal.");
-        return;
-    }
-
-    // Store user info in local state
-    document.getElementById('userName').value = name;
-    document.getElementById('userEmail').value = email;
-    document.getElementById('displayUserName').innerText = `Welcome, ${name}!`;
-
-    // Switch screens
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-
-    // Load initial data
-    showTab('chat');
-}
-
 async function showTab(tab) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -135,6 +113,10 @@ async function loginAdmin() {
         if (response.ok) {
             const data = await response.json();
             adminToken = data.token;
+
+            // Update header to indicate Admin mode
+            document.getElementById('displayUserName').innerText = "🛡️ Admin Portal";
+
             document.getElementById('admin-login').style.display = 'none';
             document.getElementById('admin-dashboard').style.display = 'block';
             loadAdminTab('tickets');
@@ -148,6 +130,12 @@ async function loginAdmin() {
 
 function logoutAdmin() {
     adminToken = null;
+
+    // Hide the main application and show the onboarding screen again
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+
+    // Reset the admin login state within the app
     document.getElementById('admin-login').style.display = 'block';
     document.getElementById('admin-dashboard').style.display = 'none';
 }
@@ -168,10 +156,17 @@ async function loadAdminTab(tab) {
         const data = await response.json();
 
         if (tab === 'tickets') {
-            let html = `<table><thead><tr><th>ID</th><th>Employee</th><th>Issue</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>ID</th><th>Employee</th><th>Issue</th><th>Status</th><th>Action</th><th>Manage</th></tr></thead><tbody>`;
             data.forEach(t => {
                 const statusClass = `badge-${t.status.toLowerCase().split(' ')[0]}`;
-                html += `<tr><td>${t.ticket_id}</td><td>${t.employee}</td><td>${t.issue}</td><td><span class="badge ${statusClass}">${t.status}</span></td><td>${t.action}</td></tr>`;
+                html += `<tr>
+                    <td>${t.ticket_id}</td>
+                    <td>${t.employee}</td>
+                    <td>${t.issue}</td>
+                    <td><span class="badge ${statusClass}">${t.status}</span></td>
+                    <td>${t.action}</td>
+                    <td><button onclick="updateTicketStatus('${t.ticket_id}')" class="admin-btn">Update Status</button></td>
+                </tr>`;
             });
             html += `</tbody></table>`;
             content.innerHTML = html;
@@ -193,6 +188,64 @@ async function loadAdminTab(tab) {
     } catch (e) {
         content.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
     }
+}
+
+async function updateTicketStatus(ticketId) {
+    const newStatus = prompt("Enter new status (e.g., Resolved, Escalated, Closed):");
+    if (!newStatus) return;
+
+    try {
+        const response = await fetch(`${API_BASE}/support/tickets/${ticketId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (response.ok) {
+            alert("Ticket updated successfully!");
+            loadAdminTab('tickets');
+        } else {
+            const data = await response.json();
+            alert(`Error: ${data.detail}`);
+        }
+    } catch (e) {
+        alert("Connection error");
+    }
+}
+
+async function openAdminLogin() {
+    // Skip the employee onboarding and go straight to admin portal
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+
+    // Set a default generic user state since we are admins
+    document.getElementById('userName').value = "Administrator";
+    document.getElementById('userEmail').value = "admin@veridian-corp.example";
+    document.getElementById('displayUserName').innerText = "🛡️ Admin Access Mode";
+
+    showTab('admin');
+}
+
+async function handleUserLogin() {
+    const name = document.getElementById('loginName').value;
+    const email = document.getElementById('loginEmail').value;
+
+    if (!name || !email) {
+        alert("Please enter both your name and email to enter the portal.");
+        return;
+    }
+
+    document.getElementById('userName').value = name;
+    document.getElementById('userEmail').value = email;
+    document.getElementById('displayUserName').innerText = `Welcome, ${name}!`;
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+
+    showTab('chat');
 }
 
 document.getElementById('sendBtn').onclick = sendRequest;

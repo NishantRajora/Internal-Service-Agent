@@ -1,11 +1,10 @@
-from database import init_db
+from database import initialize_database, DATABASE_NAME
 import json
+import sqlite3
 
 def seed_data():
-    init_db()
-
-    import sqlite3
-    from database import DB_FILE
+    print("Initializing database...")
+    initialize_database()
 
     try:
         with open("tickets.json", "r", encoding="utf-8") as file:
@@ -13,8 +12,13 @@ def seed_data():
     except FileNotFoundError:
         print("Error: tickets.json not found. Please create the file first.")
         return
+    except json.JSONDecodeError:
+        print("Error: tickets.json contains invalid JSON.")
+        return
 
-    with sqlite3.connect(DB_FILE) as conn:
+    print(f"Loading {len(existing_tickets)} historical tickets...")
+
+    with sqlite3.connect(DATABASE_NAME) as conn:
         cursor = conn.cursor()
         for t in existing_tickets:
             cursor.execute(
@@ -22,7 +26,8 @@ def seed_data():
                 (t["id"], t["employee"], t["email"], t["issue"], t["category"], t["action"], t["policy"], t["status"], "2026-01-01T00:00:00")
             )
         conn.commit()
-    print(f"✅ Successfully seeded {len(existing_tickets)} historical tickets from tickets.json into the database.")
+
+    print(f"✅ Successfully seeded {len(existing_tickets)} historical tickets into the database.")
 
 if __name__ == "__main__":
     seed_data()
