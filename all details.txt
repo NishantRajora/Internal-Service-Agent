@@ -1,0 +1,661 @@
+========================================
+PROJECT OVERVIEW
+================
+
+Project Name: Veridian Corp AI IT Support Agent
+Description: A full-stack agentic AI system designed to automate first-line IT support for Veridian Corp. The system utilizes a RAG (Retrieval-Augmented Generation) pattern to ensure AI responses are grounded in official company policies. It integrates an automated ticketing system and a secure admin dashboard for oversight.
+
+Core Objectives:
+1. Automate IT request classification and resolution.
+2. Ensure consistency through historical ticket analysis.
+3. Reduce human workload by resolving simple issues via self-service.
+4. Provide a secure audit trail of all AI decisions.
+
+========================================
+COMPLETE FILE ARCHITECTURE
+==========================
+
+/ (Root)
+├── .env                    - Environment configuration (LLM API keys, URLs)
+├── .gitignore              - Git exclusion list
+├── README.md               - Project documentation and setup guide
+├── requirements.txt        - Python dependencies
+├── main.py                 - FastAPI server and API routes
+├── agent.py                - AI Agent core logic (Classification, Decision, Response)
+├── retriever.py            - Policy retrieval logic (RAG implementation)
+├── database.py             - SQLite database operations (Tickets, Audit, Settings)
+├── auth_utils.py           - Password security utilities (Bcrypt)
+├── policies.json           - Knowledge Base (Official IT Policies)
+├── tickets.json            - Seed data for historical ticket context
+├── seed_tickets.py         - Database initialization script for historical data
+├── set_admin_password.py    - Utility to set secure admin password
+├── test_agent.py           - Standalone test suite for AI agent requests
+├── veridian_it.db          - SQLite database file (Auto-generated)
+└── static/                 - Frontend assets
+    ├── index.html          - Main application UI (Single Page App)
+    ├── script.js           - Frontend logic and API integration
+    └── style.css           - Application styling
+
+========================================
+FILE-BY-FILE USAGE
+==================
+
+FILE: main.py
+PATH: /main.py
+TYPE: Backend (Python/FastAPI)
+USED: YES
+PURPOSE: Entry point of the application. Handles HTTP routing, static file serving, and admin authentication.
+IMPORTANT FUNCTIONS: login(), handle_request(), list_tickets(), update_ticket(), list_audit_logs(), list_policies()
+IMPORTS/DEPENDENCIES: agent.py, database.py, retriever.py, auth_utils.py
+USED BY: browser (via HTTP requests)
+APIs: Internal FastAPI routes
+NOTES: Implements a simple in-memory session token store for admin access.
+
+FILE: agent.py
+PATH: /agent.py
+TYPE: Agent (Python)
+USED: YES
+PURPOSE: Orchestrates the AI workflow. Manages the sequence from user input to final response.
+IMPORTANT FUNCTIONS: process_request(), classify_request(), make_decision(), generate_response(), call_ollama()
+IMPORTS/DEPENDENCIES: retriever.py, database.py, requests, dotenv
+USED BY: main.py, test_agent.py
+APIs: Ollama API (/api/generate)
+NOTES: The "Brain" of the system. Uses JSON-formatted prompts for structured AI output.
+
+FILE: retriever.py
+PATH: /retriever.py
+TYPE: Utility/RAG (Python)
+USED: YES
+PURPOSE: Implements the retrieval mechanism to find relevant policies based on user requests.
+IMPORTANT FUNCTIONS: find_relevant_policy(), calculate_keyword_score(), load_policies()
+IMPORTS/DEPENDENCIES: policies.json
+USED BY: agent.py, main.py
+APIs: None
+NOTES: Uses a hybrid approach: Category Map first, then Keyword-based scoring.
+
+FILE: database.py
+PATH: /database.py
+TYPE: Data Layer (Python/SQLite)
+USED: YES
+PURPOSE: Manages all persistence logic for tickets, audit logs, and system settings.
+IMPORTANT FUNCTIONS: create_ticket(), get_all_tickets(), update_ticket_status(), add_audit_log(), set_setting(), get_setting()
+IMPORTS/DEPENDENCIES: sqlite3
+USED BY: main.py, agent.py, seed_tickets.py, set_admin_password.py
+APIs: SQLite
+NOTES: Handles auto-generation of ticket IDs in the format 'AUTO-XXX'.
+
+FILE: auth_utils.py
+PATH: /auth_utils.py
+TYPE: Utility (Python)
+USED: YES
+PURPOSE: Handles secure password hashing for the admin dashboard.
+IMPORTANT FUNCTIONS: hash_password(), verify_password()
+IMPORTS/DEPENDENCIES: bcrypt
+USED BY: main.py, set_admin_password.py
+APIs: None
+NOTES: Uses bcrypt for industry-standard salted hashing.
+
+FILE: policies.json
+PATH: /policies.json
+TYPE: Data (JSON)
+USED: YES
+PURPOSE: The "Ground Truth" Knowledge Base containing Veridian Corp IT policies.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: None
+USED BY: retriever.py
+APIs: None
+NOTES: Contains policies KB-01 through KB-10 and ASSET-POLICY.
+
+FILE: tickets.json
+PATH: /tickets.json
+TYPE: Data (JSON)
+USED: YES
+PURPOSE: Historical ticket data used to provide precedent for the AI agent.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: None
+USED BY: seed_tickets.py
+APIs: None
+NOTES: Seeded into the SQLite DB on first setup.
+
+FILE: static/index.html
+PATH: /static/index.html
+TYPE: Frontend (HTML)
+USED: YES
+PURPOSE: Application UI structure.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: style.css, script.js
+USED BY: browser
+APIs: None
+NOTES: Implements a tabbed interface for Support, My Tickets, and Admin.
+
+FILE: static/script.js
+PATH: /static/script.js
+TYPE: Frontend (JavaScript)
+USED: YES
+PURPOSE: Handles user interactions, API calls to the backend, and UI updates.
+IMPORTANT FUNCTIONS: sendRequest(), loadMyTickets(), loginAdmin(), updateTicketStatus(), loadAdminTab()
+IMPORTS/DEPENDENCIES: main.py (via API)
+USED BY: index.html
+APIs: /api/support/request, /api/admin/login, /api/support/tickets, etc.
+NOTES: Manages admin session tokens in memory.
+
+FILE: static/style.css
+PATH: /static/style.css
+TYPE: Frontend (CSS)
+USED: YES
+PURPOSE: Visual design and corporate branding.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: None
+USED BY: index.html
+APIs: None
+NOTES: Includes styles for a professional IT portal and a status-update modal.
+
+FILE: seed_tickets.py
+PATH: /seed_tickets.py
+TYPE: Utility (Python)
+USED: YES (Setup)
+PURPOSE: populates the database with historical context from tickets.json.
+IMPORTANT FUNCTIONS: seed_data()
+IMPORTS/DEPENDENCIES: database.py, tickets.json
+USED BY: Admin (Setup phase)
+APIs: SQLite
+NOTES: Run once during initialization.
+
+FILE: set_admin_password.py
+PATH: /set_admin_password.py
+TYPE: Utility (Python)
+USED: YES (Setup)
+PURPOSE: Securely initializes the admin password in the database.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: auth_utils.py, database.py
+USED BY: Admin (Setup phase)
+APIs: SQLite
+NOTES: Run once during initialization.
+
+FILE: test_agent.py
+PATH: /test_agent.py
+TYPE: Utility (Python)
+USED: YES (Development)
+PURPOSE: Tests the AI agent's logic with predefined requests without using the UI.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: agent.py
+USED BY: Developer
+APIs: Ollama API (via agent.py)
+NOTES: Useful for regression testing of agent decisions.
+
+FILE: .env
+PATH: /.env
+TYPE: Configuration
+USED: YES
+PURPOSE: Stores sensitive AI model configurations.
+IMPORTANT FUNCTIONS: N/A
+IMPORTS/DEPENDENCIES: None
+USED BY: agent.py
+APIs: None
+NOTES: Configures OLLAMA_BASE_URL, OLLAMA_API_KEY, and OLLAMA_MODEL.
+
+========================================
+USED VS UNUSED FILES
+====================
+
+USED FILES:
+- main.py
+- agent.py
+- retriever.py
+- database.py
+- auth_utils.py
+- policies.json
+- tickets.json
+- static/index.html
+- static/script.js
+- static/style.css
+- .env
+- requirements.txt
+- README.md
+
+POSSIBLY UNUSED / UTILITY FILES:
+- test_agent.py: Used for developer testing, not part of the production app flow.
+- seed_tickets.py: Used only once during initial setup.
+- set_admin_password.py: Used only once during initial setup.
+
+UNKNOWN:
+None.
+
+========================================
+TECH STACK
+==========
+
+- Frontend: HTML5, CSS3, Vanilla JavaScript (ES6+)
+- Backend: Python 3.x, FastAPI, Uvicorn
+- Database: SQLite
+- AI/LLM: Ollama (gpt-oss:20b)
+- Security: Bcrypt (Password Hashing), Bearer Tokens (Admin Sessions)
+- Environment: python-dotenv
+
+========================================
+FRONTEND ARCHITECTURE
+=====================
+
+The frontend is a Single Page Application (SPA) structure.
+- Layout: Tabbed navigation allowing users to switch between 'Support', 'My Tickets', and 'Admin'.
+- State Management: Managed via JavaScript variables (e.g., `adminToken`) and DOM manipulation.
+- Communication: Asynchronous `fetch` API calls to the FastAPI backend.
+- Key Components:
+    - Chat Interface: Real-time request submission and AI response display.
+    - Ticket Grid: Visual representation of employee tickets using status badges.
+    - Admin Dashboard: Table-based view for audit logs, tickets, and knowledge base.
+    - Status Modal: Professional UI for admins to update ticket statuses.
+
+========================================
+BACKEND ARCHITECTURE
+====================
+
+The backend is a RESTful API built with FastAPI.
+- Routing: Centralized in `main.py`.
+- Logic Separation:
+    - Request Handling $\rightarrow$ `main.py`
+    - AI Orchestration $\rightarrow$ `agent.py`
+    - Data Retrieval $\rightarrow$ `retriever.py`
+    - Data Persistence $\rightarrow$ `database.py`
+- Security: Admin endpoints are protected by a dependency `verify_admin_token` which checks for a valid Bearer token.
+- Session Handling: Simple in-memory dictionary `SESSION_TOKENS` stores active admin sessions.
+
+========================================
+AI AGENT ARCHITECTURE
+=====================
+
+The agent follows a strict agentic pipeline to avoid hallucinations and ensure policy compliance.
+
+COMPONENT: Request Classifier
+FILE: agent.py
+FUNCTION: classify_request()
+HOW IT WORKS: Sends the user request to the LLM with a list of valid IT categories.
+INPUT: User request string
+OUTPUT: Category name (e.g., "VPN Access")
+USED BY: process_request()
+
+COMPONENT: Knowledge Retriever
+FILE: retriever.py
+FUNCTION: find_relevant_policy()
+HOW IT WORKS: Maps the category to a policy ID or calculates a keyword score against the knowledge base.
+INPUT: Category, User request
+OUTPUT: Policy object from policies.json
+USED BY: process_request()
+
+COMPONENT: Decision Engine
+FILE: agent.py
+FUNCTION: make_decision()
+HOW IT WORKS: Combines the Policy, User Request, and Historical Precedents into a prompt for the LLM.
+INPUT: Category, Request, Policy, Historical Context
+OUTPUT: JSON object {status, action, needs_ticket, reason, follow_up}
+USED BY: process_request()
+
+COMPONENT: Response Generator
+FILE: agent.py
+FUNCTION: generate_response()
+HOW IT WORKS: Synthesizes the final employee-facing message based on the decision and policy.
+INPUT: Employee name, Request, Category, Policy, Decision, Ticket ID
+OUTPUT: Professional text response
+USED BY: process_request()
+
+========================================
+AGENT DECISION LOGIC
+====================
+
+The agent decides actions based on "Ground Truth" (Policies) and "Consistency" (History).
+
+BRANCH EXAMPLE: VPN Request
+- TRIGGER: User asks for VPN access.
+- POLICY: KB-02 (VPN Access).
+- AGENT DECISION:
+    - If Full-time employee $\rightarrow$ Resolved (Automatic).
+    - If Contractor $\rightarrow$ Escalated (Requires Manager Approval).
+- TOOL/API: If Escalated $\rightarrow$ `database.create_ticket()`.
+- RESULT: Response informing the user of the outcome.
+- FILE: agent.py
+
+BRANCH EXAMPLE: Security Incident
+- TRIGGER: User reports phishing.
+- POLICY: KB-09 (Security Incident Reporting).
+- AGENT DECISION: Always set `needs_ticket: true` for high-risk issues.
+- TOOL/API: `database.create_ticket()`.
+- RESULT: Immediate escalation to Security Team.
+- FILE: agent.py
+
+BRANCH EXAMPLE: Guest Wi-Fi
+- TRIGGER: Request for visitor Wi-Fi.
+- POLICY: KB-07 (Guest Wi-Fi Access).
+- AGENT DECISION: set `needs_ticket: false`.
+- RESULT: Instructions to use the front-desk kiosk.
+- FILE: agent.py
+
+========================================
+KNOWLEDGE BASE
+==============
+
+- Storage: `policies.json` (JSON format).
+- Loading: `retriever.py` -> `load_policies()`.
+- Retrieval:
+    1. Exact Category Match (via `CATEGORY_POLICY_MAP`).
+    2. Keyword Scoring (Phrase matching + word overlap).
+- Policy Usage Audit:
+    - KB-01 (Password): USED (Account Access)
+    - KB-02 (VPN): USED (VPN Access)
+    - KB-03 (Laptop): USED (Laptop/Hardware)
+    - KB-04 (Software): USED (Software Installation)
+    - KB-05 (Printer): USED (Printer)
+    - KB-06 (Mailbox): USED (Email/Mailbox)
+    - KB-07 (Guest Wi-Fi): USED (Guest Wi-Fi)
+    - KB-08 (Expense): USED (Expense Software)
+    - KB-09 (Security): USED (Security Incident)
+    - KB-10 (WFH): USED (Home Office Equipment)
+    - ASSET-POLICY: USED (Hardware Refresh logic)
+
+========================================
+DATA SOURCES
+============
+
+- Primary Data: `policies.json` (Policies) and `veridian_it.db` (Tickets/Audit/Settings).
+- Historical Context: `tickets.json` (Seeded into DB).
+- Input Source: User-provided text via the web frontend.
+- LLM Source: Pre-trained model `gpt-oss:20b` via Ollama.
+
+========================================
+API CALLS
+=========
+
+INTERNAL (Frontend -> Backend)
+- API: Support Request | METHOD: POST | ENDPOINT: /api/support/request | FILE: script.js | PURPOSE: Submit issue to AI
+- API: My Tickets | METHOD: GET | ENDPOINT: /api/support/my-tickets | FILE: script.js | PURPOSE: Fetch user tickets
+- API: Admin Login | METHOD: POST | ENDPOINT: /api/admin/login | FILE: script.js | PURPOSE: Authenticate admin
+- API: List Tickets | METHOD: GET | ENDPOINT: /api/support/tickets | FILE: script.js | PURPOSE: Admin view all tickets
+- API: Update Ticket | METHOD: PATCH | ENDPOINT: /api/support/tickets/{id} | FILE: script.js | PURPOSE: Admin change status
+- API: Audit Logs | METHOD: GET | ENDPOINT: /api/support/audit | FILE: script.js | PURPOSE: Admin view logs
+- API: List Policies | METHOD: GET | ENDPOINT: /api/support/policies | FILE: script.js | PURPOSE: Admin view KB
+
+EXTERNAL (Backend -> AI)
+- API: Ollama Generate | METHOD: POST | ENDPOINT: {OLLAMA_BASE_URL}/api/generate | FILE: agent.py | PURPOSE: LLM classification and reasoning
+- REQUEST BODY: {model, prompt, system, stream: false, format: "json"}
+- RESPONSE: {response: "JSON string"}
+
+========================================
+RAISE TICKET WORKFLOW
+=====================
+
+USER ACTION: User submits request "My laptop is broken"
+↓
+FRONTEND FILE: static/script.js -> sendRequest()
+↓
+API ENDPOINT: /api/support/request (POST)
+↓
+BACKEND FILE: main.py -> handle_request()
+↓
+AGENT LOGIC: agent.py -> process_request()
+    - classify_request() -> "Laptop / Hardware"
+    - find_relevant_policy() -> KB-03
+    - make_decision() -> { needs_ticket: true, status: "Escalated", ... }
+↓
+TICKET CREATION LOGIC: database.py -> create_ticket()
+    - Generates ID (e.g., AUTO-015)
+    - Sets fields: employee, email, issue, category, action, policy_id, status, created_at
+↓
+STORAGE: SQLite (tickets table)
+↓
+RESPONSE: JSON containing response text and ticket object {ticket_id: "AUTO-015", ...}
+↓
+UI: script.js -> appendMessage() (Displays "Ticket AUTO-015 has been created")
+
+========================================
+TICKET SYSTEM
+=============
+
+- Data Source: SQLite (`veridian_it.db`).
+- Schema: tickets (ticket_id, employee, email, issue, category, action, policy_id, status, created_at).
+- ID Format: `AUTO-XXX` (Sequential).
+- Statuses: Resolved, Escalated, Follow-up Required, Closed, Pending.
+- Creation: Automatic via AI Agent if `needs_ticket` is true.
+- Updating: Manual via Admin Dashboard (PATCH request).
+- History: Tracked via the `audit_logs` table.
+- Implementation: Dynamic database (not static JSON).
+
+========================================
+LLM / AI TECHNOLOGIES
+=====================
+
+- Technology: Ollama
+- Model: gpt-oss:20b
+- Pattern: RAG (Retrieval-Augmented Generation)
+- Prompting: System-level prompts for Classification, Decision, and Response generation.
+- Output Format: JSON (enforced via `format: "json"` in Ollama call).
+- RAG Mechanism: Keyword-based lookup in `policies.json`.
+
+========================================
+PROMPTS
+=======
+
+- Classification Prompt: "You are an IT support classifier... Classify the user's request into exactly one of these categories... Return result as JSON."
+- Decision Prompt: "You are the Decision Engine... Use the provided Policy as the primary ground truth... If the user explicitly asks to 'create a ticket'... you MUST set needs_ticket to true."
+- Response Prompt: "You are a polite and professional IT Support Agent... Write a response to the employee based on the provided decision and policy."
+
+========================================
+INPUTS
+======
+
+- Employee Name: String (from UI)
+- Employee Email: EmailStr (from UI)
+- User Request: String (from UI)
+- Admin Password: String (from UI)
+- Policy Data: JSON (from files)
+- Historical Tickets: JSON (from files)
+
+========================================
+DATA FLOW
+=========
+
+User Input (UI)
+↓
+FastAPI Endpoint (main.py)
+↓
+AI Agent Workflow (agent.py)
+    ├─ Classification (LLM)
+    ├─ Policy Retrieval (retriever.py $\rightarrow$ policies.json)
+    ├─ Precedent Fetching (database.py $\rightarrow$ tickets table)
+    └─ Decision Making (LLM)
+↓
+Ticket Action (database.py $\rightarrow$ SQLite) [Optional]
+↓
+Response Generation (LLM)
+↓
+FastAPI Response (JSON)
+↓
+UI Display (script.js)
+
+========================================
+HUMAN ESCALATION
+================
+
+Human escalation is triggered when the AI Agent determines that a request cannot be solved via self-service.
+- Condition: `needs_ticket` set to `true` by the Decision Engine.
+- Action: A record is created in the `tickets` database table.
+- Visibility: The ticket appears in the Admin Dashboard for human IT staff to review and manually update the status to 'Resolved' or 'Closed'.
+
+========================================
+SECURITY
+========
+
+- Admin Access: Protected by hashed passwords (Bcrypt) and Bearer tokens.
+- Data Protection: API endpoints for tickets and audit logs require `verify_admin_token` dependency.
+- Input Validation: Pydantic models used in FastAPI for type checking (`SupportRequest`, `LoginRequest`).
+
+========================================
+ERROR HANDLING
+==============
+
+- API Errors: FastAPI `HTTPException` used to return 401 (Unauthorized), 404 (Not Found), and 500 (Internal Server Error).
+- Agent Errors: Try-except blocks in `process_request` and `call_ollama` to prevent server crashes on AI failures.
+- Frontend Errors: `try-catch` blocks around `fetch` calls with user-facing alerts.
+- Database Errors: Basic error handling in `database.py` and `seed_tickets.py`.
+
+========================================
+DEPLOYMENT / RUN INSTRUCTIONS
+=============================
+
+Prerequisites:
+- Python 3.10+
+- Ollama installed and running locally with `gpt-oss:20b` model.
+
+Installation:
+1. `pip install -r requirements.txt`
+2. Create `.env` with:
+   OLLAMA_BASE_URL=http://localhost:11434
+   OLLAMA_MODEL=gpt-oss:20b
+
+Initialization:
+1. `python set_admin_password.py` (Sets the admin login)
+2. `python seed_tickets.py` (Loads historical data)
+
+Execution:
+1. `python main.py`
+2. Open browser to `http://127.0.0.1:8000`
+
+========================================
+DEMO CAPABILITIES
+=================
+
+- Feature: AI-Powered Support
+  - How to test: Submit "I need to reset my password" or "My laptop is broken".
+  - Expected: AI classifies the request, cites a policy (KB-01 or KB-03), and either resolves it or creates a ticket.
+- Feature: Admin Management
+  - How to test: Log in as admin $\rightarrow$ Go to Tickets tab.
+  - Expected: View all generated tickets and use the "Update Status" modal to change status.
+- Feature: Audit Trail
+  - How to test: Log in as admin $\rightarrow$ Go to Audit Trail tab.
+  - Expected: View a complete log of every request processed by the agent.
+
+========================================
+ASSIGNMENT REQUIREMENT MAPPING
+==============================
+
+| Requirement | Implementation | Files/Evidence |
+| ----------- | -------------- | -------------- |
+| Working Agent | Full AI pipeline implemented | agent.py, main.py |
+| Clickable Prototype | Full-stack Web UI | static/index.html, script.js |
+| Architecture | Agentic workflow (Classify $\rightarrow$ Retrieve $\rightarrow$ Decide) | agent.py |
+| Process Flow | Request $\rightarrow$ LLM $\rightarrow$ Policy $\rightarrow$ Ticket | agent.py, database.py |
+| Inputs | User name, email, and text request | main.py (Pydantic models) |
+| Sources | policies.json as ground truth | policies.json, retriever.py |
+| Assumptions | Uses Ollama for local LLM execution | .env, agent.py |
+| AI Tools | Ollama / gpt-oss:20b | agent.py |
+| Ticket Handling | Automatic creation and manual update | database.py, script.js |
+| Human Escalation | Ticket creation for human review | agent.py (needs_ticket) |
+| Demo | Fully functional local server | main.py |
+
+========================================
+COMPLETE SOLUTION ARCHITECTURE
+==============================
+
+The solution is a "Grounded AI Agent".
+1. The User interacts with a Frontend.
+2. The Backend acts as a Controller.
+3. The Agent acts as the Orchestrator.
+4. The Knowledge Base (JSON) acts as the source of truth.
+5. The LLM (Ollama) provides the reasoning capability.
+6. The SQLite Database provides persistence and auditability.
+
+This ensures that the AI does not "make up" policies, as it is forced to retrieve a policy first and use it as the basis for its decision.
+
+========================================
+END-TO-END PROCESS FLOW
+=======================
+
+[User] $\rightarrow$ [Frontend: index.html] $\rightarrow$ [Backend: main.py] $\rightarrow$ [Agent: agent.py] $\rightarrow$ [Retrieval: retriever.py] $\rightarrow$ [KB: policies.json] $\rightarrow$ [LLM: Ollama] $\rightarrow$ [Decision: agent.py] $\rightarrow$ [Storage: database.py] $\rightarrow$ [Response: agent.py] $\rightarrow$ [Frontend: script.js] $\rightarrow$ [User]
+
+========================================
+LIMITATIONS
+===========
+
+- LLM Dependency: Requires Ollama to be running locally.
+- Session Management: Admin tokens are in-memory and lost on server restart.
+- Retrieval: Keyword-based retrieval is simple; would benefit from vector embeddings for complex queries.
+- Concurrency: SQLite is used; not suitable for extremely high-volume concurrent writes.
+
+========================================
+10-SLIDE PPT CONTENT RECOMMENDATION
+===================================
+
+Slide 1: Title
+- Title: Veridian Corp AI IT Support Agent
+- Key Points: Intelligent Agentic IT Support System.
+- Visual: Project Logo / Robot Icon.
+- Evidence: README.md
+
+Slide 2: Problem & Objective
+- Title: The IT Support Challenge
+- Key Points: High volume of repetitive requests, inconsistency in policy application, manual ticketing overhead.
+- Visual: "Old Way" (Manual) vs "New Way" (AI Agent) diagram.
+- Evidence: README.md
+
+Slide 3: Solution Overview
+- Title: Grounded AI Support Agent
+- Key Points: Full-stack solution using a RAG pattern. Automated classification, grounded reasoning, and ticketing.
+- Visual: High-level block diagram (User $\rightarrow$ Agent $\rightarrow$ Admin).
+- Evidence: main.py, agent.py
+
+Slide 4: Complete Architecture
+- Title: System Architecture
+- Key Points: FastAPI Backend, Vanilla JS Frontend, SQLite DB, Ollama LLM.
+- Visual: Technical architecture diagram showing file relationships.
+- Evidence: File Architecture section of audit.
+
+Slide 5: Agent Workflow & Decision Logic
+- Title: The Agentic Pipeline
+- Key Points: Classify $\rightarrow$ Retrieve $\rightarrow$ Decide $\rightarrow$ Respond.- JSON structured output for reliability.
+- Visual: Flowchart of agent.py's process_request().
+- Evidence: agent.py
+
+Slide 6: Data Sources, Inputs & Knowledge Base
+- Title: Knowledge Grounding
+- Key Points: policies.json as "Ground Truth". Keyword-based retrieval. Seeded historical data for consistency.
+- Visual: Snippet of policies.json and a "Policy Match" example.
+- Evidence: policies.json, retriever.py
+
+Slide 7: APIs & Raise Ticket Workflow
+- Title: Automated Ticketing & APIs
+- Key Points: Dynamic ticket creation based on AI decision. Secure Admin API endpoints.
+- Visual: Sequence diagram: User $\rightarrow$ Agent $\rightarrow$ Ticket DB.
+- Evidence: database.py, script.js
+
+Slide 8: AI Tools & Technology
+- Title: AI Technology Stack
+- Key Points: Ollama (Local LLM), gpt-oss:20b model. RAG implementation without external vector DBs (for simplicity).
+- Visual: Logos of Python, FastAPI, Ollama.
+- Evidence: .env, agent.py
+
+Slide 9: Demo / Use Cases
+- Title: System in Action
+- Key Points: Case 1: Password Reset (Self-service). Case 2: Phishing Report (Automatic Escalation). Case 3: Admin Status Update.
+- Visual: Screenshots of the Chat and Admin Panel.
+- Evidence: test_agent.py, static/index.html
+
+Slide 10: Conclusion / Implementation Summary
+- Title: Project Outcomes
+- Key Points: Reduced resolution time, guaranteed policy compliance, fully auditable IT support.
+- Visual: Summary table of requirements met.
+- Evidence: Assignment Mapping section.
+
+========================================
+APPENDIX
+========
+
+- Full API Route List:
+    - POST /api/admin/login
+    - POST /api/support/request
+    - GET /api/support/my-tickets
+    - GET /api/support/tickets
+    - PATCH /api/support/tickets/{id}
+    - GET /api/support/audit
+    - GET /api/support/policies
+- Database Schema:
+    - tickets: (ticket_id, employee, email, issue, category, action, policy_id, status, created_at)
+    - audit_logs: (id, timestamp, action, details)
+    - settings: (key, value)
