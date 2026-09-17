@@ -217,12 +217,40 @@ async function loadAdminTab(tab) {
     }
 }
 
+let currentUpdatingTicketId = null;
+
 async function updateTicketStatus(ticketId) {
-    const newStatus = prompt("Enter new status (e.g., Resolved, Escalated, Closed):");
-    if (!newStatus) return;
+    currentUpdatingTicketId = ticketId;
+    document.getElementById('modal-ticket-id').innerText = `Ticket: ${ticketId}`;
+    document.getElementById('status-modal').style.display = 'flex';
+
+    // Reset modal state
+    document.getElementById('status-select').value = 'Resolved';
+    document.getElementById('custom-status-container').style.display = 'none';
+    document.getElementById('custom-status-input').value = '';
+}
+
+function closeStatusModal() {
+    document.getElementById('status-modal').style.display = 'none';
+    currentUpdatingTicketId = null;
+}
+
+async function submitStatusUpdate() {
+    if (!currentUpdatingTicketId) return;
+
+    const statusSelect = document.getElementById('status-select');
+    let newStatus = statusSelect.value;
+
+    if (newStatus === 'custom') {
+        newStatus = document.getElementById('custom-status-input').value;
+        if (!newStatus) {
+            alert("Please enter a custom status");
+            return;
+        }
+    }
 
     try {
-        const response = await fetch(`${API_BASE}/support/tickets/${ticketId}`, {
+        const response = await fetch(`${API_BASE}/support/tickets/${currentUpdatingTicketId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -233,6 +261,7 @@ async function updateTicketStatus(ticketId) {
 
         if (response.ok) {
             alert("Ticket updated successfully!");
+            closeStatusModal();
             loadAdminTab('tickets');
         } else {
             const data = await response.json();
@@ -242,6 +271,20 @@ async function updateTicketStatus(ticketId) {
         alert("Connection error");
     }
 }
+
+// Initialize modal listener
+document.addEventListener('DOMContentLoaded', () => {
+    const statusSelect = document.getElementById('status-select');
+    if (statusSelect) {
+        statusSelect.addEventListener('change', (e) => {
+            const container = document.getElementById('custom-status-container');
+            if (container) {
+                container.style.display = e.target.value === 'custom' ? 'block' : 'none';
+            }
+        });
+    }
+});
+
 
 async function openAdminLogin() {
     // Skip the employee onboarding and go straight to admin portal

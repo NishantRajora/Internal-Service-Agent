@@ -127,6 +127,33 @@
         </main>
     </div>
     <script src="/static/script.js"></script>
+
+    <!-- Status Update Modal -->
+    <div id="status-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Update Ticket Status</h3>
+            <p id="modal-ticket-id">Ticket: </p>
+            <div class="input-group">
+                <label>Select Status</label>
+                <select id="status-select">
+                    <option value="Resolved">Resolved</option>
+                    <option value="Escalated">Escalated</option>
+                    <option value="Follow-up Required">Follow-up Required</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="custom">Custom...</option>
+                </select>
+            </div>
+            <div id="custom-status-container" class="input-group" style="display: none;">
+                <label>Custom Status</label>
+                <input type="text" id="custom-status-input" placeholder="Enter status...">
+            </div>
+            <div class="modal-actions">
+                <button onclick="closeStatusModal()" class="secondary-btn">Cancel</button>
+                <button onclick="submitStatusUpdate()" class="primary-btn">Update</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

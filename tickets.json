@@ -1,12 +1,102 @@
 [
-    {"id": "TK-1042", "employee": "R. Verma", "email": "r.verma@veridian-corp.example", "issue": "VPN credential expired", "status": "Resolved (closed)", "category": "VPN Access", "action": "Renewed credentials", "policy": "KB-02"},
-    {"id": "TK-1043", "employee": "S. Iyer", "email": "s.iyer@veridian-corp.example", "issue": "Laptop replacement (3.2 yrs old)", "status": "Approved - pending fulfillment", "category": "Laptop / Hardware", "action": "Approved for replacement", "policy": "KB-03"},
-    {"id": "TK-1044", "employee": "A. Khan", "email": "a.khan@veridian-corp.example", "issue": "Non-catalog software request", "status": "Pending Security review", "category": "Software Installation", "action": "Security review pending", "policy": "KB-04"},
-    {"id": "TK-1045", "employee": "P. Joshi", "email": "p.joshi@veridian-corp.example", "issue": "Mailbox quota increase", "status": "Approved at 35GB (closed)", "category": "Email / Mailbox", "action": "Quota increased to 35GB", "policy": "KB-06"},
-    {"id": "TK-1046", "employee": "M. Das", "email": "m.das@veridian-corp.example", "issue": "Printer paper jam, floor 2", "status": "Resolved (closed)", "category": "Printer", "action": "Cleared jam", "policy": "KB-05"},
-    {"id": "TK-1047", "employee": "K. Singh", "email": "k.singh@veridian-corp.example", "issue": "Home office equipment request", "status": "Pending Finance", "category": "Home Office Equipment", "action": "Finance approval pending", "policy": "KB-10"},
-    {"id": "TK-1048", "employee": "T. Rao", "email": "t.rao@veridian-corp.example", "issue": "Phishing email reported", "status": "Escalated to Security - under investigation", "category": "Security Incident", "action": "Security team investigation", "policy": "KB-09"},
-    {"id": "TK-1049", "employee": "V. Nambiar", "email": "v.nambiar@veridian-corp.example", "issue": "Password reset", "status": "Resolved (closed)", "category": "Account Access", "action": "Password reset", "policy": "KB-01"},
-    {"id": "TK-1050", "employee": "J. Fernandes", "email": "j.fernandes@veridian-corp.example", "issue": "Admin access request", "status": "Rejected - no business justification provided (closed)", "category": "Admin / Server Access", "action": "Access denied", "policy": "None"},
-    {"id": "TK-1051", "employee": "L. Menon", "email": "l.menon@veridian-corp.example", "issue": "Guest Wi-Fi issued", "status": "Resolved (closed)", "category": "Guest Wi-Fi", "action": "Credentials generated", "policy": "KB-07"}
+    {
+        "id": "TK-1042",
+        "employee": "R. Verma",
+        "email": "r.verma@veridian-corp.example",
+        "issue": "VPN credential expired",
+        "status": "Resolved (closed)",
+        "category": "VPN Access",
+        "action": "Renewed credentials",
+        "policy": "KB-02"
+    },
+    {
+        "id": "TK-1043",
+        "employee": "S. Iyer",
+        "email": "s.iyer@veridian-corp.example",
+        "issue": "Laptop replacement (3.2 yrs old)",
+        "status": "Approved - pending fulfillment",
+        "category": "Laptop / Hardware",
+        "action": "Approved for replacement",
+        "policy": "KB-03"
+    },
+    {
+        "id": "TK-1044",
+        "employee": "A. Khan",
+        "email": "a.khan@veridian-corp.example",
+        "issue": "Non-catalog software request",
+        "status": "Pending Security review",
+        "category": "Software Installation",
+        "action": "Security review pending",
+        "policy": "KB-04"
+    },
+    {
+        "id": "TK-1045",
+        "employee": "P. Joshi",
+        "email": "p.joshi@veridian-corp.example",
+        "issue": "Mailbox quota increase",
+        "status": "Approved at 35GB (closed)",
+        "category": "Email / Mailbox",
+        "action": "Quota increased to 35GB",
+        "policy": "KB-06"
+    },
+    {
+        "id": "TK-1046",
+        "employee": "M. Das",
+        "email": "m.das@veridian-corp.example",
+        "issue": "Printer paper jam, floor 2",
+        "status": "Resolved (closed)",
+        "category": "Printer",
+        "action": "Cleared jam",
+        "policy": "KB-05"
+    },
+    {
+        "id": "TK-1047",
+        "employee": "K. Singh",
+        "email": "k.singh@veridian-corp.example",
+        "issue": "Home office equipment request",
+        "status": "Pending Finance",
+        "category": "Home Office Equipment",
+        "action": "Finance approval pending",
+        "policy": "KB-10"
+    },
+    {
+        "id": "TK-1048",
+        "employee": "T. Rao",
+        "email": "t.rao@veridian-corp.example",
+        "issue": "Phishing email reported",
+        "status": "Escalated to Security - under investigation",
+        "category": "Security Incident",
+        "action": "Security team investigation",
+        "policy": "KB-09"
+    },
+    {
+        "id": "TK-1049",
+        "employee": "V. Nambiar",
+        "email": "v.nambiar@veridian-corp.example",
+        "issue": "Password reset",
+        "status": "Resolved (closed)",
+        "category": "Account Access",
+        "action": "Password reset",
+        "policy": "KB-01"
+    },
+    {
+        "id": "TK-1050",
+        "employee": "J. Fernandes",
+        "email": "j.fernandes@veridian-corp.example",
+        "issue": "Admin access request",
+        "status": "Rejected - no business justification provided (closed)",
+        "category": "Admin / Server Access",
+        "action": "Access denied",
+        "policy": "None"
+    },
+    {
+        "id": "TK-1051",
+        "employee": "L. Menon",
+        "email": "l.menon@veridian-corp.example",
+        "issue": "Guest Wi-Fi issued",
+        "status": "Resolved (closed)",
+        "category": "Guest Wi-Fi",
+        "action": "Credentials generated",
+        "policy": "KB-07"
+    }
 ]
