@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veridian Corp IT Support</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="main-body">
+    <!-- Onboarding / Login Screen -->
+    <div id="login-screen" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-robot"></i>
+                <h1>Veridian Corp</h1>
+                <p>Internal IT Support Portal</p>
+            </div>
+            <div class="auth-form">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="loginName" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label>Employee Email</label>
+                    <input type="email" id="loginEmail" placeholder="email@veridian-corp.example">
+                </div>
+                <button onclick="handleUserLogin()" class="primary-btn">Enter Portal <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application Container (Hidden by default) -->
+    <div id="main-app" class="container" style="display: none;">
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1 id="displayUserName">Veridian IT Support</h1>
+            </div>
+            <nav>
+                <button onclick="showTab('chat')" class="nav-btn active" id="btn-chat">💬 Support</button>
+                <button onclick="showTab('my-tickets')" class="nav-btn" id="btn-my-tickets">🎫 My Tickets</button>
+                <button onclick="showTab('admin')" class="nav-btn" id="btn-admin">🔐 Admin</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Chat Section -->
+            <section id="chat-section" class="tab-content active">
+                <div class="chat-container">
+                    <div class="user-info">
+                        <div class="input-group">
+                            <label>Name</label>
+                            <input type="text" id="userName" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="userEmail" readonly>
+                        </div>
+                    </div>
+
+                    <div class="chat-box" id="chatBox">
+                        <div class="message ai-message">
+                            Hello! I am the Veridian IT Support Agent. Please describe your issue below.
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <input type="text" id="userRequest" placeholder="Describe your IT problem...">
+                        <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Tickets Section -->
+            <section id="my-tickets-section" class="tab-content">
+                <div class="tickets-container">
+                    <h2 id="myTicketsTitle">Your Tickets</h2>
+                    <div id="myTicketsList" class="tickets-list">
+                        <p class="empty-msg">Loading your tickets...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin-section" class="tab-content">
+                <div id="admin-login">
+                    <div class="login-card">
+                        <h2>Admin Login</h2>
+                        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+                        <button onclick="loginAdmin()" class="primary-btn">Login</button>
+                    </div>
+                </div>
+
+                <div id="admin-dashboard" style="display: none;">
+                    <div class="admin-controls">
+                        <button onclick="logoutAdmin()" class="logout-btn">Logout</button>
+                    </div>
+
+                    <div class="admin-tabs">
+                        <button onclick="loadAdminTab('tickets')" class="admin-tab-btn active" id="tab-tickets">Tickets</button>
+                        <button onclick="loadAdminTab('audit')" class="admin-tab-btn" id="tab-audit">Audit Trail</button>
+                        <button onclick="loadAdminTab('policies')" class="admin-tab-btn" id="tab-policies">Policies</button>
+                    </div>
+
+                    <div id="admin-content" class="admin-content">
+                        <!-- Data loaded via JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
